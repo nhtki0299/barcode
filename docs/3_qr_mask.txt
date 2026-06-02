@@ -1,0 +1,30 @@
+==================================================
+TÀI LIỆU SỐ 3: BÍ ẨN CỦA "MASK PATTERN" TRONG QR CODE
+==================================================
+
+1. Tại sao phải có Mask Pattern?
+Để tránh hiện tượng ma trận tạo ra những mảng đen/trắng khổng lồ (khiến máy quét mất đồng bộ), chuẩn QR Code yêu cầu phải "đảo ngược" (XOR) các bit dữ liệu bằng một mẫu hình học gọi là Mask Pattern.
+
+2. Tám (8) loại Mask Pattern
+Dưới đây là hình ảnh biểu diễn 8 loại Mask Pattern (từ Mask 0 đến Mask 7) trên lưới:
+
+[IMAGE: qr_masks.png]
+
+Có 8 công thức tính Mask khác nhau dựa trên Toạ độ hàng (r) và cột (c). 
+Hàm XOR được định nghĩa: Lật bit khi kết quả M(r, c) = 0.
+
+- Mask 0: (r + c) mod 2 == 0
+- Mask 1: r mod 2 == 0
+- Mask 2: c mod 3 == 0
+- Mask 3: (r + c) mod 3 == 0
+- Mask 4: (⌊r / 2⌋ + ⌊c / 3⌋) mod 2 == 0
+- Mask 5: (r * c) mod 2 + (r * c) mod 3 == 0
+- Mask 6: ((r * c) mod 2 + (r * c) mod 3) mod 2 == 0
+- Mask 7: ((r + c) mod 2 + (r * c) mod 3) mod 2 == 0
+
+3. Thuật toán chọn Mask (Penalty Scoring)
+QR Code sinh ra 8 phiên bản khác nhau, sau đó tiến hành chấm điểm Phạt (Penalty) thông qua các công thức toán học nghiêm ngặt:
+
+[IMAGE: penalty_formula.png]
+
+=> Phiên bản nào có tổng Điểm Phạt thấp nhất sẽ được chọn làm kết quả xuất ra màn hình!

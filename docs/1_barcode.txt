@@ -1,0 +1,29 @@
+==================================================
+TÀI LIỆU SỐ 1: MÃ VẠCH 1D (BARCODE)
+==================================================
+
+1. Giới thiệu chung
+Mã vạch 1D (One-Dimensional) là thế hệ mã vạch đầu tiên, lưu trữ dữ liệu bằng cách thay đổi độ rộng của các vạch đen (Bars) và khoảng trắng (Spaces) chạy song song nhau. Dữ liệu chỉ được đọc theo một chiều duy nhất (chiều ngang).
+
+2. Các chuẩn mã vạch phổ biến
+- Code 128: Hỗ trợ toàn bộ 128 ký tự ASCII. Độ dài dữ liệu biến đổi. Rất mạnh mẽ trong logistics và quản lý kho bãi. Dữ liệu được nén qua 3 bộ ký tự (Set A, B, C). Set C có khả năng nén 2 chữ số vào 1 vạch.
+- Code 39: Chuẩn cũ hơn, chỉ hỗ trợ chữ in hoa, số và một vài ký tự đặc biệt (-, ., $, /, +, %). Mã vạch thường khá dài do không có khả năng nén tốt.
+- EAN-13: Tiêu chuẩn mã vạch bán lẻ quốc tế (Châu Âu & Việt Nam). Luôn luôn có đúng 13 chữ số. Chữ số cuối cùng là số kiểm tra (Check digit).
+
+3. Cấu trúc chung của một mã 1D
+- Quiet Zone (Vùng yên tĩnh): Khoảng trắng ở 2 đầu mã vạch giúp máy quét nhận diện điểm bắt đầu/kết thúc.
+- Start Character (Ký tự bắt đầu): Một chuỗi vạch đặc biệt báo hiệu cho máy quét biết chuẩn mã vạch và hướng quét.
+- Data Characters (Dữ liệu): Mỗi ký tự được quy định bởi một tổ hợp vạch đen/trắng (VD: trong Code 128, mỗi ký tự thường gồm 3 vạch đen và 3 khoảng trắng).
+- Check Digit (Ký tự kiểm tra): Một thuật toán toán học (Modulo) tính toán từ các dữ liệu trước đó để chống đọc sai.
+- Stop Character (Ký tự kết thúc): Báo hiệu hết dữ liệu.
+
+4. Giải thuật Checksum cơ bản (Ví dụ EAN-13)
+Cách tính số kiểm tra của EAN-13 (Modulo 10) được tóm tắt qua công thức toán học sau:
+
+[IMAGE: ean13_formula.png]
+
+Thuật toán chi tiết:
+- Bước 1: Cộng các số ở vị trí lẻ (1, 3, 5, 7, 9, 11).
+- Bước 2: Cộng các số ở vị trí chẵn (2, 4, 6, 8, 10, 12) và nhân tổng này với 3.
+- Bước 3: Cộng kết quả của Bước 1 và Bước 2.
+- Bước 4: Lấy 10 trừ đi số hàng đơn vị của kết quả Bước 3. (Nếu hàng đơn vị là 0 thì check digit là 0).

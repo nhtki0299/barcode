@@ -1,0 +1,29 @@
+==================================================
+TÀI LIỆU SỐ 4: DATAMATRIX VÀ CHUẨN ECC200
+==================================================
+
+1. Giới thiệu chung
+DataMatrix có hình dáng gọn gàng hơn, khả năng chống lỗi siêu việt ở kích thước cực nhỏ. Nó được tin dùng rộng rãi trong công nghiệp điện tử, quân sự và y tế.
+
+2. Cấu trúc viền đặc trưng
+Dưới đây là sơ đồ cấu trúc của một DataMatrix (14x14):
+
+[IMAGE: datamatrix.png]
+
+- Màu Đỏ (L-Finder Pattern): Viền Trái và Dưới luôn luôn là khối nét liền. Giúp xác định gốc toạ độ và góc xoay.
+- Màu Xanh (Clock Track): Viền Phải và Trên luôn xen kẽ Trắng/Đen. Giúp máy quét đếm số lượng cột và hàng.
+- Vùng màu Xám (Data): Chứa các module dữ liệu được xếp theo quy tắc zíc-zắc 45 độ.
+
+3. Thuật toán thả bit Zíc-zắc (Snake path)
+- Toàn bộ dữ liệu được chia thành các khối 8-bit (Codewords).
+- Mỗi khối 8-bit được thả vào dưới hình dạng "Hình Utah" (Z-shape).
+- Bit MSB (Bit 7) nằm giữa, các bit còn lại xếp xung quanh. Khi đâm vào tường, chuỗi quét tự động Wrap-around (vòng qua lề đối diện).
+
+4. Sửa lỗi ECC200
+ECC200 sử dụng mã hoá Reed-Solomon với khả năng sửa lỗi tối đa tự động lên đến khoảng 30%, tương đương mức H của QR Code.
+
+Tuy nhiên, khác biệt cốt lõi là DataMatrix chạy các phép toán này trên Trường số học Galois Field được định nghĩa riêng rẽ:
+
+[IMAGE: datamatrix_gf_formula.png]
+
+Sự khác biệt về số mũ (x^5 thay vì x^4) khiến cho DataMatrix hoàn toàn không tương thích ngược với hệ thống giải mã của QR Code.

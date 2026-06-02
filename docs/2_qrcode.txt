@@ -1,0 +1,30 @@
+==================================================
+TÀI LIỆU SỐ 2: TỔNG QUAN VỀ QR CODE
+==================================================
+
+1. Giới thiệu chung
+QR Code (Quick Response Code) được phát minh năm 1994 bởi Denso Wave. Là mã vạch 2 chiều (2D Matrix), nó lưu trữ dữ liệu theo cả 2 trục ngang và dọc, giúp tăng dung lượng lưu trữ lên hàng trăm lần so với mã 1D.
+
+2. Cấu trúc của một ma trận QR Code
+Dưới đây là mô hình giải phẫu cơ bản của QR Code Version 1 (21x21 modules):
+
+[IMAGE: qr_anatomy.png]
+
+- Màu Đỏ (Finder Patterns): 3 ô vuông lớn nằm ở 3 góc. Giúp định vị mã quét.
+- Màu Xanh (Timing Patterns): Dải xen kẽ Trắng/Đen nối giữa các ô Finder.
+- Màu Trắng (Data & EC): Vùng chứa dữ liệu, quét zíc-zắc từ dưới lên trên.
+
+3. Sửa lỗi Reed-Solomon (Error Correction)
+QR Code sinh các byte sửa lỗi dựa trên thuật toán đa thức Reed-Solomon trong trường Galois (Galois Field).
+
+Dưới đây là phương trình Toán học mô tả Đa thức sinh (Generator Polynomial) dùng trong bộ mã hoá:
+[IMAGE: rs_formula.png]
+
+Và đây là không gian số học GF(2^8) - nơi mà mọi phép tính Cộng/Nhân của QR Code được thực hiện:
+[IMAGE: gf_formula.png]
+
+Khả năng khôi phục tối đa của các mức:
+- Mức L (Low): Khôi phục ~7%
+- Mức M (Medium): Khôi phục ~15%
+- Mức Q (Quartile): Khôi phục ~25%
+- Mức H (High): Khôi phục ~30%
