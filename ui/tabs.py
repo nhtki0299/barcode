@@ -257,7 +257,7 @@ def setup_process_tab(parent, app):
     app.proc_gray_var = ctk.BooleanVar(value=False)
     ctk.CTkSwitch(control_frame, text="Grayscale (Ảnh xám)", variable=app.proc_gray_var, command=app.update_processed_preview, font=FONT_NORMAL).pack(pady=5, padx=10, anchor="w")
 
-    ctk.CTkLabel(control_frame, text="Brightness (Độ sáng)", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10,0))
+    ctk.CTkLabel(control_frame, text="Brightness (Độ sáng)", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10, 0))
     app.proc_brightness_var = ctk.DoubleVar(value=0)
     ctk.CTkSlider(control_frame, from_=-100, to=100, variable=app.proc_brightness_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
 
@@ -269,7 +269,7 @@ def setup_process_tab(parent, app):
     app.proc_sharpen_var = ctk.BooleanVar(value=False)
     ctk.CTkSwitch(control_frame, text="Sharpen (Làm nét)", variable=app.proc_sharpen_var, command=app.update_processed_preview, font=FONT_NORMAL).pack(pady=5, padx=10, anchor="w")
 
-    ctk.CTkLabel(control_frame, text="Blur Kernel Size", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10,0))
+    ctk.CTkLabel(control_frame, text="Blur Kernel Size", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10, 0))
     app.proc_blur_var = ctk.IntVar(value=1)
     ctk.CTkSlider(control_frame, from_=1, to=9, number_of_steps=4, variable=app.proc_blur_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
 

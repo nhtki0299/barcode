@@ -88,6 +88,15 @@ python3 app.py
 4. Chờ phần mềm chạy Engine phân tích. Kết quả toạ độ, phân tích bit và văn bản giải mã sẽ hiện ở khung Log. Hình ảnh cũng sẽ được vẽ viền bao quanh các mã quét được.
 5. Nếu mã quét được là DataMatrix, nút **Trích xuất lưới 8-bit** sẽ phát sáng để bạn có thể mở Explorer nghiên cứu khối mã.
 
+### Chế độ Xử Lý Ảnh (Process Tab)
+1. Chuyển sang Tab "Xử Lý Ảnh".
+2. Tải ảnh lên và tinh chỉnh các thông số: độ sáng, độ tương phản, làm mờ/làm nét, nhị phân hoá (Thresholding) hoặc hình thái học.
+3. Bấm **CHUYỂN SANG GIẢI MÃ** để đưa ảnh đã xử lý sang bộ giải mã để tăng khả năng đọc mã mờ/hỏng.
+
+### Chế độ Tài Liệu (Docs Tab)
+1. Chuyển sang Tab "Tài Liệu".
+2. Đọc các tài liệu kỹ thuật về cấu trúc, Mask Pattern, và cơ chế của các loại mã vạch (Barcode 1D, QR, DataMatrix).
+
 ---
 
 ## 📁 Cấu trúc thư mục

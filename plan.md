@@ -41,7 +41,7 @@ pip install customtkinter pillow python-barcode qrcode pystrich pyzbar pylibdmtx
 
 ## 3. Giao diện ứng dụng (UI Layout)
 
-Giao diện sử dụng `CTkTabview` chia làm 2 chế độ chính: **Mã Hoá (Encode)** và **Giải Mã (Decode)**.
+Giao diện chia làm 4 chế độ chính qua thanh Sidebar: **Mã Hoá (Encode)**, **Giải Mã (Decode)**, **Xử Lý Ảnh (Process)** và **Tài Liệu (Docs)**.
 
 ### Tab: Mã Hoá (Encode)
 ```
@@ -49,7 +49,7 @@ Giao diện sử dụng `CTkTabview` chia làm 2 chế độ chính: **Mã Hoá 
 │              🔲 Code Generator                          │
 │              Barcode • DataMatrix • QR Code             │
 ├─────────────────────────────────────────────────────────┤
-│ [ Tab Mã Hoá (Encode) ]  [ Tab Giải Mã (Decode) ]       │
+│ [ Sidebar: Mã Hoá / Giải Mã / Xử Lý Ảnh / Tài Liệu ]    │
 ├─────────────────────────────────────────────────────────┤
 │  ┌─────────────────────────────────────────────────┐    │
 │  │  📝 Nhập text cần mã hóa...                     │    │
@@ -92,9 +92,9 @@ Giao diện sử dụng `CTkTabview` chia làm 2 chế độ chính: **Mã Hoá 
 ### 4.1 Class `CodeGeneratorApp(ctk.CTk)`
 
 **Khởi tạo GUI** (`__init__`):
-- Window size: `900x700`, title: `"Code Generator"`
-- `ctk.set_appearance_mode("dark")`, theme: `"dark-blue"`
-- Grid layout responsive: 2 cột chính cho Log và Preview
+- Window size: `1100x750`, title: `"Pro Barcode Studio"`
+- `ctk.set_appearance_mode("dark")`, theme: `"blue"`
+- Grid layout responsive: Cột trái (Sidebar) và Cột phải (Main Content)
 
 ### 4.2 Danh sách Widgets
 

@@ -328,7 +328,7 @@ class CodeGeneratorApp(ctk.CTk):
             self.btn_open_explorer.configure(state="disabled")
             
             self.decode_log_textbox.delete("1.0", "end")
-            self.decode_log_textbox.insert("end", f"Đã nhận ảnh từ Tab Xử Lý Ảnh.\nSẵn sàng giải mã...\n")
+            self.decode_log_textbox.insert("end", "Đã nhận ảnh từ Tab Xử Lý Ảnh.\nSẵn sàng giải mã...\n")
             
             self.select_frame("decode")
             self.run_decode()
