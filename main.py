@@ -3,9 +3,10 @@ from tkinter import filedialog, messagebox
 from PIL import Image, ImageDraw
 import io
 
-from ui.tabs import setup_encode_tab, setup_decode_tab, setup_doc_tab
+from ui.tabs import setup_encode_tab, setup_decode_tab, setup_doc_tab, setup_process_tab
 from core.encode import generate_barcode, generate_qrcode, generate_datamatrix, build_log
 from core.decode import run_decode
+from core.image_processing import apply_image_processing
 from explorers.datamatrix import open_datamatrix_explorer
 from explorers.qr import open_qr_explorer
 
@@ -40,19 +41,24 @@ class CodeGeneratorApp(ctk.CTk):
         self.nav_btn_decode = ctk.CTkButton(self.sidebar_frame, text="🔍 GIẢI MÃ", corner_radius=8, height=40, border_spacing=10, text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"), anchor="w", font=ctk.CTkFont(size=14, weight="bold"), command=lambda: self.select_frame("decode"))
         self.nav_btn_decode.grid(row=2, column=0, padx=15, pady=5, sticky="ew")
 
+        self.nav_btn_process = ctk.CTkButton(self.sidebar_frame, text="🛠️ XỬ LÝ ẢNH", corner_radius=8, height=40, border_spacing=10, text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"), anchor="w", font=ctk.CTkFont(size=14, weight="bold"), command=lambda: self.select_frame("process"))
+        self.nav_btn_process.grid(row=3, column=0, padx=15, pady=5, sticky="ew")
+
         self.nav_btn_doc = ctk.CTkButton(self.sidebar_frame, text="📚 TÀI LIỆU", corner_radius=8, height=40, border_spacing=10, text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"), anchor="w", font=ctk.CTkFont(size=14, weight="bold"), command=lambda: self.select_frame("doc"))
-        self.nav_btn_doc.grid(row=3, column=0, padx=15, pady=5, sticky="ew")
+        self.nav_btn_doc.grid(row=4, column=0, padx=15, pady=5, sticky="ew")
         
         # ----------------------------------------------------
         # MAIN CONTENT (RIGHT)
         # ----------------------------------------------------
         self.encode_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.decode_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.process_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.doc_frame = ctk.CTkFrame(self, fg_color="transparent")
 
         # Setup Nội dung
         setup_encode_tab(self.encode_frame, self)
         setup_decode_tab(self.decode_frame, self)
+        setup_process_tab(self.process_frame, self)
         setup_doc_tab(self.doc_frame, self)
 
         # Trạng thái ban đầu
@@ -61,6 +67,9 @@ class CodeGeneratorApp(ctk.CTk):
         self.loaded_decode_image = None
         self.loaded_decode_image_path = None
         self.decoded_results = []
+        
+        self.raw_process_image = None
+        self.processed_image = None
         
         self.select_frame("encode")
 
@@ -71,11 +80,13 @@ class CodeGeneratorApp(ctk.CTk):
         
         self.nav_btn_encode.configure(fg_color=default_color)
         self.nav_btn_decode.configure(fg_color=default_color)
+        self.nav_btn_process.configure(fg_color=default_color)
         self.nav_btn_doc.configure(fg_color=default_color)
         
         # Ẩn tất cả frame
         self.encode_frame.grid_forget()
         self.decode_frame.grid_forget()
+        self.process_frame.grid_forget()
         self.doc_frame.grid_forget()
         
         # Hiện frame được chọn và đổi màu
@@ -85,6 +96,9 @@ class CodeGeneratorApp(ctk.CTk):
         elif name == "decode":
             self.nav_btn_decode.configure(fg_color=active_color)
             self.decode_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
+        elif name == "process":
+            self.nav_btn_process.configure(fg_color=active_color)
+            self.process_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
         elif name == "doc":
             self.nav_btn_doc.configure(fg_color=active_color)
             self.doc_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
@@ -246,7 +260,78 @@ class CodeGeneratorApp(ctk.CTk):
             self.qr_explorer_window = win
         
     def open_decoded_explorer(self):
-        messagebox.showinfo("Thông báo", "Tính năng xem cấu trúc mã được giải mã sẽ được cập nhật trong phiên bản sau.")
+        if not hasattr(self, "decoded_results") or not self.decoded_results:
+            messagebox.showwarning("Cảnh báo", "Không có dữ liệu giải mã.")
+            return
+
+        for res in self.decoded_results:
+            if res.get("type") == "DataMatrix":
+                text = res.get("data", "")
+                
+                if hasattr(self, "dm_explorer_window") and self.dm_explorer_window is not None and self.dm_explorer_window.winfo_exists():
+                    self.dm_explorer_window.destroy()
+                    
+                win = open_datamatrix_explorer(text, self)
+                if win:
+                    self.dm_explorer_window = win
+                return
+                
+        messagebox.showinfo("Thông báo", "Không tìm thấy DataMatrix trong kết quả giải mã để trích xuất.")
+
+    def load_process_image(self):
+        filepath = filedialog.askopenfilename(filetypes=[("Image files", "*.png *.jpg *.jpeg *.bmp"), ("All files", "*.*")])
+        if filepath:
+            img = Image.open(filepath).convert("RGB")
+            self.raw_process_image = img
+            self.update_processed_preview()
+            self.btn_send_decode.configure(state="normal")
+
+    def update_processed_preview(self):
+        if not self.raw_process_image:
+            return
+            
+        params = {
+            'invert': self.proc_invert_var.get(),
+            'contrast': self.proc_contrast_var.get(),
+            'brightness': self.proc_brightness_var.get(),
+            'grayscale': self.proc_gray_var.get(),
+            'sharpen': self.proc_sharpen_var.get(),
+            'blur_kernel': self.proc_blur_var.get(),
+            'threshold_type': self.proc_thresh_type_var.get(),
+            'threshold_val': self.proc_thresh_val_var.get(),
+            'adaptive_block': self.proc_adaptive_block_var.get(),
+            'adaptive_c': self.proc_adaptive_c_var.get(),
+            'morph_type': self.proc_morph_type_var.get(),
+            'morph_iter': self.proc_morph_iter_var.get()
+        }
+        
+        try:
+            self.processed_image = apply_image_processing(self.raw_process_image, params)
+            
+            img_copy = self.processed_image.copy()
+            img_copy.thumbnail((500, 500), Image.Resampling.LANCZOS)
+            self.process_image_ctk = ctk.CTkImage(light_image=img_copy, dark_image=img_copy, size=(img_copy.width, img_copy.height))
+            self.process_preview_label.configure(image=self.process_image_ctk, text="")
+        except Exception as e:
+            self.process_preview_label.configure(text=f"Lỗi: {str(e)}", image="")
+
+    def send_to_decode(self):
+        if self.processed_image:
+            self.loaded_decode_image = self.processed_image
+            
+            img_copy = self.processed_image.copy()
+            img_copy.thumbnail((400, 400), Image.Resampling.LANCZOS)
+            self.decode_image_ctk = ctk.CTkImage(light_image=img_copy, dark_image=img_copy, size=(img_copy.width, img_copy.height))
+            self.decode_preview_label.configure(image=self.decode_image_ctk, text="")
+            
+            self.btn_run_decode.configure(state="normal")
+            self.btn_open_explorer.configure(state="disabled")
+            
+            self.decode_log_textbox.delete("1.0", "end")
+            self.decode_log_textbox.insert("end", f"Đã nhận ảnh từ Tab Xử Lý Ảnh.\nSẵn sàng giải mã...\n")
+            
+            self.select_frame("decode")
+            self.run_decode()
 
 if __name__ == "__main__":
     app = CodeGeneratorApp()

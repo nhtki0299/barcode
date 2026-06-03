@@ -50,10 +50,7 @@ def generate_datamatrix(text: str) -> Image.Image:
     encoder.cellsize = 10
     encoder.margin = 10
     
-    fp = io.BytesIO()
-    encoder.save(fp)
-    fp.seek(0)
-    return Image.open(fp).convert("RGB")
+    return encoder.get_pilimage(encoder.cellsize).convert("RGB")
 
 def _log_barcode(text: str) -> str:
     log = ""

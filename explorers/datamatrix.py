@@ -21,30 +21,44 @@ def open_datamatrix_explorer(text: str, parent=None):
     class Tracker:
         cw_map = []
         cw_anchors = {}
+        cw_id = 0
+        bit_idx = 7
 
     def new_place(self, codewords, matrix):
-        Tracker.cw_map = [[None for _ in range(self.cols)] for _ in range(self.rows)]
+        Tracker.cw_map = [[None for _ in range(len(matrix[0]))] for _ in range(len(matrix))]
         Tracker.cw_anchors = {}
+        Tracker.cw_id = 0
+        Tracker.bit_idx = 7
         return orig_place(self, codewords, matrix)
 
     def new_ps(self, position, codeword):
-        Tracker.cw_anchors[codeword] = position
+        Tracker.cw_id += 1
+        Tracker.cw_anchors[Tracker.cw_id] = position
+        Tracker.bit_idx = 7
         return orig_ps(self, position, codeword)
 
     def new_s1(self, cw): 
-        Tracker.cw_anchors[cw] = (self.rows-1, 0)
+        Tracker.cw_id += 1
+        Tracker.cw_anchors[Tracker.cw_id] = (self.rows-1, 0)
+        Tracker.bit_idx = 7
         return orig_s1(self, cw)
 
     def new_s2(self, cw): 
-        Tracker.cw_anchors[cw] = (self.rows-3, 0)
+        Tracker.cw_id += 1
+        Tracker.cw_anchors[Tracker.cw_id] = (self.rows-3, 0)
+        Tracker.bit_idx = 7
         return orig_s2(self, cw)
 
     def new_s3(self, cw): 
-        Tracker.cw_anchors[cw] = (self.rows-2, 0)
+        Tracker.cw_id += 1
+        Tracker.cw_anchors[Tracker.cw_id] = (self.rows-3, 0)
+        Tracker.bit_idx = 7
         return orig_s3(self, cw)
 
     def new_s4(self, cw): 
-        Tracker.cw_anchors[cw] = (self.rows-1, 0)
+        Tracker.cw_id += 1
+        Tracker.cw_anchors[Tracker.cw_id] = (self.rows-1, 0)
+        Tracker.bit_idx = 7
         return orig_s4(self, cw)
 
     def new_pb(self, position, bit):
@@ -56,11 +70,12 @@ def open_datamatrix_explorer(text: str, parent=None):
             c += self.cols
             r += 4 - ((self.cols + 4) % 8)
         
-        cw_id = self.cw
-        bit_idx = bit
+        cw_id = Tracker.cw_id
+        bit_idx = Tracker.bit_idx
+        Tracker.bit_idx -= 1
+        
         if 0 <= r < self.rows and 0 <= c < self.cols:
-            raw_bit = ((self.codewords[cw_id-1] >> bit_idx) & 1) if cw_id > 0 else 0
-            Tracker.cw_map[r][c] = (cw_id, bit_idx, raw_bit)
+            Tracker.cw_map[r][c] = (cw_id, bit_idx, bit)
             
         return orig_pb(self, position, bit)
 

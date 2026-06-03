@@ -235,3 +235,78 @@ def setup_doc_tab(parent, app):
     app.doc_buttons.append(btn4)
 
     load_doc("1_barcode.txt", btn1)
+
+def setup_process_tab(parent, app):
+    parent.grid_columnconfigure(0, weight=1, minsize=350)
+    parent.grid_columnconfigure(1, weight=2)
+    parent.grid_rowconfigure(0, weight=1)
+
+    # 1. Control Panel (Left)
+    control_frame = ctk.CTkScrollableFrame(parent, corner_radius=12, fg_color=CARD_BG)
+    control_frame.grid(row=0, column=0, padx=(0, 7.5), pady=0, sticky="nsew")
+
+    ctk.CTkLabel(control_frame, text="Tải Ảnh Lên", font=FONT_TITLE).pack(pady=(10, 5), anchor="w", padx=10)
+    app.btn_process_load = ctk.CTkButton(control_frame, text="🖼️ Tải Ảnh Mới", font=FONT_NORMAL, command=app.load_process_image, fg_color="#3F3F46", hover_color="#52525B")
+    app.btn_process_load.pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="1. Màu Sắc & Tương Phản", font=FONT_TITLE, text_color=ACCENT_COLOR).pack(pady=(20, 5), anchor="w", padx=10)
+    
+    app.proc_invert_var = ctk.BooleanVar(value=False)
+    ctk.CTkSwitch(control_frame, text="Invert Colors (Đảo màu)", variable=app.proc_invert_var, command=app.update_processed_preview, font=FONT_NORMAL).pack(pady=5, padx=10, anchor="w")
+    
+    app.proc_gray_var = ctk.BooleanVar(value=False)
+    ctk.CTkSwitch(control_frame, text="Grayscale (Ảnh xám)", variable=app.proc_gray_var, command=app.update_processed_preview, font=FONT_NORMAL).pack(pady=5, padx=10, anchor="w")
+
+    ctk.CTkLabel(control_frame, text="Brightness (Độ sáng)", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10,0))
+    app.proc_brightness_var = ctk.DoubleVar(value=0)
+    ctk.CTkSlider(control_frame, from_=-100, to=100, variable=app.proc_brightness_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="Contrast (Độ tương phản)", font=FONT_NORMAL).pack(anchor="w", padx=10)
+    app.proc_contrast_var = ctk.DoubleVar(value=1.0)
+    ctk.CTkSlider(control_frame, from_=0.1, to=3.0, variable=app.proc_contrast_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="2. Làm Mờ / Làm Nét", font=FONT_TITLE, text_color=ACCENT_COLOR).pack(pady=(20, 5), anchor="w", padx=10)
+    app.proc_sharpen_var = ctk.BooleanVar(value=False)
+    ctk.CTkSwitch(control_frame, text="Sharpen (Làm nét)", variable=app.proc_sharpen_var, command=app.update_processed_preview, font=FONT_NORMAL).pack(pady=5, padx=10, anchor="w")
+
+    ctk.CTkLabel(control_frame, text="Blur Kernel Size", font=FONT_NORMAL).pack(anchor="w", padx=10, pady=(10,0))
+    app.proc_blur_var = ctk.IntVar(value=1)
+    ctk.CTkSlider(control_frame, from_=1, to=9, number_of_steps=4, variable=app.proc_blur_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="3. Thresholding (Nhị phân)", font=FONT_TITLE, text_color=ACCENT_COLOR).pack(pady=(20, 5), anchor="w", padx=10)
+    app.proc_thresh_type_var = ctk.StringVar(value="None")
+    ctk.CTkOptionMenu(control_frame, variable=app.proc_thresh_type_var, values=["None", "Simple", "Adaptive"], command=lambda e: app.update_processed_preview(), font=FONT_NORMAL).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="Simple Threshold (Ngưỡng)", font=FONT_NORMAL).pack(anchor="w", padx=10)
+    app.proc_thresh_val_var = ctk.IntVar(value=127)
+    ctk.CTkSlider(control_frame, from_=0, to=255, variable=app.proc_thresh_val_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="Adaptive Block Size", font=FONT_NORMAL).pack(anchor="w", padx=10)
+    app.proc_adaptive_block_var = ctk.IntVar(value=11)
+    ctk.CTkSlider(control_frame, from_=3, to=99, number_of_steps=48, variable=app.proc_adaptive_block_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="Adaptive C", font=FONT_NORMAL).pack(anchor="w", padx=10)
+    app.proc_adaptive_c_var = ctk.IntVar(value=2)
+    ctk.CTkSlider(control_frame, from_=0, to=20, variable=app.proc_adaptive_c_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="4. Morphology (Hình thái học)", font=FONT_TITLE, text_color=ACCENT_COLOR).pack(pady=(20, 5), anchor="w", padx=10)
+    app.proc_morph_type_var = ctk.StringVar(value="None")
+    ctk.CTkOptionMenu(control_frame, variable=app.proc_morph_type_var, values=["None", "Dilation", "Erosion", "Open (Xóa nhiễu trắng)", "Close (Nối nét đứt)"], command=lambda e: app.update_processed_preview(), font=FONT_NORMAL).pack(pady=5, padx=10, fill="x")
+
+    ctk.CTkLabel(control_frame, text="Số lần lặp (Iterations)", font=FONT_NORMAL).pack(anchor="w", padx=10)
+    app.proc_morph_iter_var = ctk.IntVar(value=1)
+    ctk.CTkSlider(control_frame, from_=1, to=5, number_of_steps=4, variable=app.proc_morph_iter_var, command=lambda e: app.update_processed_preview()).pack(pady=5, padx=10, fill="x")
+
+    # 2. Preview Panel (Right)
+    preview_frame = ctk.CTkFrame(parent, corner_radius=12, fg_color=CARD_BG)
+    preview_frame.grid(row=0, column=1, padx=(7.5, 0), pady=0, sticky="nsew")
+    preview_frame.grid_rowconfigure(1, weight=1)
+    preview_frame.grid_columnconfigure(0, weight=1)
+
+    ctk.CTkLabel(preview_frame, text="🖼️ Ảnh Trước Khi Giải Mã", font=FONT_TITLE).grid(row=0, column=0, pady=10)
+    
+    app.process_preview_label = ctk.CTkLabel(preview_frame, text="[Vui lòng tải ảnh lên]", font=FONT_NORMAL, fg_color="#18181B", corner_radius=8)
+    app.process_preview_label.grid(row=1, column=0, padx=15, pady=(0, 15), sticky="nsew")
+
+    app.btn_send_decode = ctk.CTkButton(preview_frame, text="🚀 CHUYỂN SANG GIẢI MÃ", font=("Roboto", 16, "bold"), command=app.send_to_decode, state="disabled", height=50, fg_color=ACCENT_COLOR, hover_color="#0284C7")
+    app.btn_send_decode.grid(row=2, column=0, padx=15, pady=(0, 15), sticky="ew")
